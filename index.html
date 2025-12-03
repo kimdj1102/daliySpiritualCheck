@@ -8,35 +8,84 @@
     <!-- React & ReactDOM CDN -->
     <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
-    <!-- Babel (JSX 사용용) -->
+    <!-- Babel (JSX 변환용) -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   </head>
   <body class="bg-gray-50">
     <div id="root"></div>
 
-    <script type="text/babel">
+    <!-- React 코드 -->
+    <script type="text/babel" data-presets="env,react">
       const { useState, useEffect } = React;
 
       const members = ['권헤빈', '김연지', '김동준', '이주원', '조예닮', '홍유라'];
 
       const weekDays = [
         { day: '일요일', items: [{ name: '주일 선교훈련', points: 7 }] },
-        { day: '월요일', items: [{ name: '큐티', points: 4 }, { name: '낭독', points: 4 }, { name: '기도', points: 4 }] },
-        { day: '화요일', items: [{ name: '큐티', points: 4 }, { name: '낭독', points: 4 }, { name: '기도', points: 4 }] },
-        { day: '수요일', items: [{ name: '큐티', points: 4 }, { name: '낭독', points: 4 }, { name: '기도', points: 4 }, { name: '수요기도회', points: 7 }] },
-        { day: '목요일', items: [{ name: '큐티', points: 4 }, { name: '낭독', points: 4 }, { name: '기도', points: 4 }] },
-        { day: '금요일', items: [{ name: '큐티', points: 4 }, { name: '낭독', points: 4 }, { name: '기도', points: 4 }, { name: '금요철야', points: 7 }] },
-        { day: '토요일', items: [{ name: '큐티', points: 4 }, { name: '낭독', points: 4 }, { name: '기도', points: 4 }, { name: '철철야', points: 7 }] }
+        {
+          day: '월요일',
+          items: [
+            { name: '큐티', points: 4 },
+            { name: '낭독', points: 4 },
+            { name: '기도', points: 4 },
+          ],
+        },
+        {
+          day: '화요일',
+          items: [
+            { name: '큐티', points: 4 },
+            { name: '낭독', points: 4 },
+            { name: '기도', points: 4 },
+          ],
+        },
+        {
+          day: '수요일',
+          items: [
+            { name: '큐티', points: 4 },
+            { name: '낭독', points: 4 },
+            { name: '기도', points: 4 },
+            { name: '수요기도회', points: 7 },
+          ],
+        },
+        {
+          day: '목요일',
+          items: [
+            { name: '큐티', points: 4 },
+            { name: '낭독', points: 4 },
+            { name: '기도', points: 4 },
+          ],
+        },
+        {
+          day: '금요일',
+          items: [
+            { name: '큐티', points: 4 },
+            { name: '낭독', points: 4 },
+            { name: '기도', points: 4 },
+            { name: '금요철야', points: 7 },
+          ],
+        },
+        {
+          day: '토요일',
+          items: [
+            { name: '큐티', points: 4 },
+            { name: '낭독', points: 4 },
+            { name: '기도', points: 4 },
+            { name: '철철야', points: 7 },
+          ],
+        },
       ];
 
       function SpiritualCheck() {
         const [selectedMember, setSelectedMember] = useState(null);
         const [checks, setChecks] = useState({});
-        const [viewMode, setViewMode] = useState('today'); // 'today', 'weekly', 'monthly'
+        const [viewMode, setViewMode] = useState('today'); // 'today' | 'weekly' | 'monthly'
 
+        // 멤버 변경 시 로컬스토리지에서 불러오기
         useEffect(() => {
           if (selectedMember) {
-            const saved = localStorage.getItem(`spiritual-check-${selectedMember}`);
+            const saved = localStorage.getItem(
+              `spiritual-check-${selectedMember}`
+            );
             if (saved) {
               setChecks(JSON.parse(saved));
             } else {
@@ -45,17 +94,21 @@
           }
         }, [selectedMember]);
 
+        // 체크 변경 시 로컬스토리지에 저장
         useEffect(() => {
           if (selectedMember) {
-            localStorage.setItem(`spiritual-check-${selectedMember}`, JSON.stringify(checks));
+            localStorage.setItem(
+              `spiritual-check-${selectedMember}`,
+              JSON.stringify(checks)
+            );
           }
         }, [checks, selectedMember]);
 
         const toggleCheck = (dayIndex, itemIndex) => {
           const key = `${dayIndex}-${itemIndex}`;
-          setChecks(prev => ({
+          setChecks((prev) => ({
             ...prev,
-            [key]: !prev[key]
+            [key]: !prev[key],
           }));
         };
 
@@ -73,7 +126,7 @@
         };
 
         const getTodayIndex = () => {
-          return new Date().getDay(); // 0(일요일)~6(토요일)
+          return new Date().getDay(); // 0 (일요일) ~ 6 (토요일)
         };
 
         const getWeeklyHistory = () => {
@@ -94,7 +147,11 @@
 
             let weekScore = 0;
 
-            for (let d = new Date(weekStart); d <= weekEnd; d.setDate(d.getDate() + 1)) {
+            for (
+              let d = new Date(weekStart);
+              d <= weekEnd;
+              d.setDate(d.getDate() + 1)
+            ) {
               const dayIndex = d.getDay();
               const dayData = weekDays[dayIndex];
 
@@ -109,7 +166,7 @@
             weeks.push({
               start: new Date(weekStart),
               end: new Date(weekEnd),
-              score: weekScore
+              score: weekScore,
             });
 
             weekStart.setDate(weekStart.getDate() + 7);
@@ -122,17 +179,23 @@
           return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
               <div className="w-full max-w-md">
-                <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">영성체크</h1>
+                <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">
+                  영성체크
+                </h1>
                 <div className="bg-white rounded-lg shadow-sm p-6">
-                  <h2 className="text-lg font-semibold mb-4 text-gray-700">멤버 선택</h2>
+                  <h2 className="text-lg font-semibold mb-4 text-gray-700">
+                    멤버 선택
+                  </h2>
                   <div className="space-y-2">
-                    {members.map(member => (
+                    {members.map((member) => (
                       <button
                         key={member}
                         onClick={() => setSelectedMember(member)}
                         className="w-full p-4 text-left bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors border border-gray-200"
                       >
-                        <span className="text-gray-800 font-medium">{member}</span>
+                        <span className="text-gray-800 font-medium">
+                          {member}
+                        </span>
                       </button>
                     ))}
                   </div>
@@ -154,6 +217,7 @@
         return (
           <div className="min-h-screen bg-gray-50 p-4">
             <div className="max-w-2xl mx-auto">
+              {/* 상단 헤더 */}
               <div className="mb-6 flex items-center justify-between">
                 <button
                   onClick={() => setSelectedMember(null)}
@@ -162,7 +226,9 @@
                   <span className="text-lg">◀</span>
                   <span className="ml-1">뒤로</span>
                 </button>
-                <h1 className="text-2xl font-bold text-gray-800">{selectedMember}</h1>
+                <h1 className="text-2xl font-bold text-gray-800">
+                  {selectedMember}
+                </h1>
                 <button
                   onClick={() => setViewMode('monthly')}
                   className="flex items-center gap-1 px-3 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
@@ -172,6 +238,7 @@
                 </button>
               </div>
 
+              {/* 이번 주 점수 */}
               <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
                 <div className="text-center">
                   <div className="text-gray-600 mb-2">이번 주 점수</div>
@@ -182,6 +249,7 @@
                 </div>
               </div>
 
+              {/* 모드 탭 */}
               {viewMode !== 'monthly' && (
                 <div className="flex gap-2 mb-6">
                   <button
@@ -209,6 +277,7 @@
                 </div>
               )}
 
+              {/* 월별 뷰 */}
               {viewMode === 'monthly' ? (
                 <div>
                   <div className="mb-6 flex items-center justify-between">
@@ -220,27 +289,36 @@
                       <span className="ml-1">돌아가기</span>
                     </button>
                     <h2 className="text-xl font-bold text-gray-800">
-                      {new Date().getFullYear()}년 {new Date().getMonth() + 1}월
+                      {new Date().getFullYear()}년{' '}
+                      {new Date().getMonth() + 1}월
                     </h2>
                     <div className="w-20"></div>
                   </div>
 
                   <div className="space-y-3">
                     {weeklyHistory.map((week, index) => (
-                      <div key={index} className="bg-white rounded-lg shadow-sm p-5">
+                      <div
+                        key={index}
+                        className="bg-white rounded-lg shadow-sm p-5"
+                      >
                         <div className="flex items-center justify-between mb-3">
                           <div className="text-gray-700 font-medium">
-                            {index + 1}주차 ({formatDate(week.start)} ~ {formatDate(week.end)})
+                            {index + 1}주차 ({formatDate(week.start)} ~{' '}
+                            {formatDate(week.end)})
                           </div>
                           <div className="text-lg font-bold text-blue-600">
                             {week.score}
-                            <span className="text-sm text-gray-400">/100</span>
+                            <span className="text-sm text-gray-400">
+                              /100
+                            </span>
                           </div>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-3">
                           <div
                             className="h-3 rounded-full bg-blue-500 transition-all"
-                            style={{ width: `${Math.min(week.score, 100)}%` }}
+                            style={{
+                              width: `${Math.min(week.score, 100)}%`,
+                            }}
                           ></div>
                         </div>
                       </div>
@@ -248,22 +326,32 @@
 
                     <div className="bg-white rounded-lg shadow-sm p-5 border-2 border-blue-500">
                       <div className="flex items-center justify-between">
-                        <div className="text-gray-700 font-semibold text-lg">월 평균</div>
+                        <div className="text-gray-700 font-semibold text-lg">
+                          월 평균
+                        </div>
                         <div className="text-2xl font-bold text-blue-600">
                           {weeklyHistory.length > 0
                             ? Math.round(
-                                weeklyHistory.reduce((sum, week) => sum + week.score, 0) / weeklyHistory.length
+                                weeklyHistory.reduce(
+                                  (sum, week) => sum + week.score,
+                                  0
+                                ) / weeklyHistory.length
                               )
                             : 0}
-                          <span className="text-base text-gray-400">/100</span>
+                          <span className="text-base text-gray-400">
+                            /100
+                          </span>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
               ) : viewMode === 'today' ? (
+                // 오늘 뷰
                 <div className="bg-white rounded-lg shadow-sm p-6">
-                  <h3 className="text-xl font-bold text-gray-800 mb-4">{todayData.day}</h3>
+                  <h3 className="text-xl font-bold text-gray-800 mb-4">
+                    {todayData.day}
+                  </h3>
                   <div className="space-y-3">
                     {todayData.items.map((item, itemIndex) => {
                       const key = `${todayIndex}-${itemIndex}`;
@@ -279,11 +367,19 @@
                               : 'bg-gray-50 border-gray-200 hover:border-gray-300'
                           }`}
                         >
-                          <span className={`font-medium text-lg ${isChecked ? 'text-blue-700' : 'text-gray-700'}`}>
+                          <span
+                            className={`font-medium text-lg ${
+                              isChecked ? 'text-blue-700' : 'text-gray-700'
+                            }`}
+                          >
                             {item.name}
                           </span>
                           <div className="flex items-center gap-3">
-                            <span className={`text-base ${isChecked ? 'text-blue-600' : 'text-gray-500'}`}>
+                            <span
+                              className={`text-base ${
+                                isChecked ? 'text-blue-600' : 'text-gray-500'
+                              }`}
+                            >
                               {item.points}점
                             </span>
                             <div
@@ -291,7 +387,9 @@
                                 isChecked ? 'bg-blue-500' : 'bg-gray-200'
                               }`}
                             >
-                              {isChecked && <span className="text-white text-lg">✔</span>}
+                              {isChecked && (
+                                <span className="text-white text-lg">✔</span>
+                              )}
                             </div>
                           </div>
                         </button>
@@ -300,24 +398,41 @@
                   </div>
                 </div>
               ) : (
+                // 주간 전체표 뷰
                 <div className="bg-white rounded-lg shadow-sm overflow-x-auto">
                   <table className="w-full">
                     <thead>
                       <tr className="border-b">
-                        <th className="p-3 text-left text-sm font-semibold text-gray-700">요일</th>
-                        <th className="p-3 text-center text-sm font-semibold text-gray-700">큐티</th>
-                        <th className="p-3 text-center text-sm font-semibold text-gray-700">낭독</th>
-                        <th className="p-3 text-center text-sm font-semibold text-gray-700">기도</th>
-                        <th className="p-3 text-center text-sm font-semibold text-gray-700">
-                          주일<br />선교훈련
+                        <th className="p-3 text-left text-sm font-semibold text-gray-700">
+                          요일
                         </th>
                         <th className="p-3 text-center text-sm font-semibold text-gray-700">
-                          수요<br />기도회
+                          큐티
                         </th>
                         <th className="p-3 text-center text-sm font-semibold text-gray-700">
-                          금요<br />철야
+                          낭독
                         </th>
-                        <th className="p-3 text-center text-sm font-semibold text-gray-700">철철야</th>
+                        <th className="p-3 text-center text-sm font-semibold text-gray-700">
+                          기도
+                        </th>
+                        <th className="p-3 text-center text-sm font-semibold text-gray-700">
+                          주일
+                          <br />
+                          선교훈련
+                        </th>
+                        <th className="p-3 text-center text-sm font-semibold text-gray-700">
+                          수요
+                          <br />
+                          기도회
+                        </th>
+                        <th className="p-3 text-center text-sm font-semibold text-gray-700">
+                          금요
+                          <br />
+                          철야
+                        </th>
+                        <th className="p-3 text-center text-sm font-semibold text-gray-700">
+                          철철야
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
@@ -326,11 +441,24 @@
                           <td className="p-3 text-sm font-medium text-gray-700">
                             {day.day.replace('요일', '')}
                           </td>
-                          {['큐티', '낭독', '기도', '주일 선교훈련', '수요기도회', '금요철야', '철철야'].map(itemName => {
-                            const item = day.items.find(i => i.name === itemName);
+                          {[
+                            '큐티',
+                            '낭독',
+                            '기도',
+                            '주일 선교훈련',
+                            '수요기도회',
+                            '금요철야',
+                            '철철야',
+                          ].map((itemName) => {
+                            const item = day.items.find(
+                              (i) => i.name === itemName
+                            );
                             if (!item) {
                               return (
-                                <td key={itemName} className="p-3 text-center text-gray-300">
+                                <td
+                                  key={itemName}
+                                  className="p-3 text-center text-gray-300"
+                                >
                                   -
                                 </td>
                               );
@@ -341,12 +469,20 @@
                             return (
                               <td key={itemName} className="p-3 text-center">
                                 <button
-                                  onClick={() => toggleCheck(dayIdx, itemIdx)}
+                                  onClick={() =>
+                                    toggleCheck(dayIdx, itemIdx)
+                                  }
                                   className={`w-8 h-8 rounded-full flex items-center justify-center mx-auto ${
-                                    isChecked ? 'bg-blue-500' : 'bg-gray-200 hover:bg-gray-300'
+                                    isChecked
+                                      ? 'bg-blue-500'
+                                      : 'bg-gray-200 hover:bg-gray-300'
                                   }`}
                                 >
-                                  {isChecked && <span className="text-white text-sm">✔</span>}
+                                  {isChecked && (
+                                    <span className="text-white text-sm">
+                                      ✔
+                                    </span>
+                                  )}
                                 </button>
                               </td>
                             );
@@ -362,7 +498,8 @@
         );
       }
 
-      ReactDOM.createRoot(document.getElementById('root')).render(<SpiritualCheck />);
+      const root = ReactDOM.createRoot(document.getElementById('root'));
+      root.render(<SpiritualCheck />);
     </script>
   </body>
 </html>
